@@ -121,6 +121,12 @@ locals {
       value = v
     }
   ]
+  task_secrets = [
+    for k, v in var.task_container_secrets : {
+      name      = k
+      valueFrom = v
+    }
+  ]
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -158,8 +164,10 @@ resource "aws_ecs_task_definition" "task" {
         }
     },
     "stopTimeout": ${var.stop_timeout},
+    "secrets": ${jsonencode(local.task_secrets)},
     "command": ${jsonencode(var.task_container_command)},
     "environment": ${jsonencode(local.task_environment)}
+
 }]
 EOF
 }
